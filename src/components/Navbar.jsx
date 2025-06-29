@@ -1,49 +1,81 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import CircularText from './CircularText'; // Import the separated component
+import CircularText from './CircularText';
+import { Logo } from '../assets/images/picData';
 
-// =======================================================
-// IMPORTANT: LOGO IMPORT
-// The build environment can't access your local files, so I'm using a placeholder.
-// To use your own logo, REMOVE the line below and UNCOMMENT the import line.
-// Make sure the path '../assets/images/picData' is correct for your project structure.
+/**
+ * A custom hook to detect scroll direction.
+ * @returns {String} 'up' or 'down'
+ */
+const useScrollDirection = () => {
+  const [scrollDirection, setScrollDirection] = useState(null);
+  const lastScrollY = useRef(0);
 
- import { Logo } from '../assets/images/picData';
-// =======================================================
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current) {
+        setScrollDirection('down');
+      } else {
+        setScrollDirection('up');
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return scrollDirection;
+};
+
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const circularTextRef = useRef(null); // Create a ref for the CircularText component
+  const circularTextRef = useRef(null);
+  const scrollDirection = useScrollDirection(); // Use the custom hook
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Common styles for nav links. 
-  // You can replace these with <Link> or <ScrollLink> if you have react-router-dom or react-scroll installed.
   const navLinkClasses = "hover:text-gray-500 px-3 py-2 cursor-pointer rounded-md";
   const mobileNavLinkClasses = "block hover:text-gray-500 cursor-pointer py-2";
 
+  // Framer Motion variants for the navbar animation
+  const navbarVariants = {
+    // Navbar is visible
+    visible: {
+      y: 0,
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+    // Navbar is hidden (slid up)
+    hidden: {
+      y: '-100%',
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+  };
+
   return (
     <motion.nav
-      className="bg-gray-200 p-4 w-full top-0 z-30 shadow-md"
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      className="bg-gray-200 p-4 w-full fixed top-0 z-30 shadow-md"
+      variants={navbarVariants}
+      // Animate based on scroll direction. Show if scrolling up, hide if scrolling down (and not at the top).
+      animate={scrollDirection === 'down' ? 'hidden' : 'visible'}
+      initial="visible"
     >
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo with animation and circular text */}
         <a href="#" className="flex items-center" onClick={closeMenu}>
-          
-          <div 
+          <div
             className="relative flex items-center justify-center mr-3"
-            // Trigger the hover effect on the CircularText component via its ref
             onMouseEnter={() => circularTextRef.current?.hoverStart()}
             onMouseLeave={() => circularTextRef.current?.hoverEnd()}
           >
-            {/* The circular text component positioned absolutely around the logo */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <CircularText
-                ref={circularTextRef} // Assign the ref
+                ref={circularTextRef}
                 text=" A - W - B -"
                 radius={40}
                 spinDuration={25}
@@ -52,8 +84,6 @@ function Navbar() {
                 textSize="text-[10px] font-semibold"
               />
             </div>
-
-            {/* The logo image is in the center */}
             <motion.img
               src={Logo}
               alt="Store logo"
@@ -62,7 +92,6 @@ function Navbar() {
               transition={{ type: 'spring', stiffness: 300 }}
             />
           </div>
-
           <motion.span
             className="font-bold text-xl text-deep-purple-800"
             initial={{ opacity: 0 }}
@@ -82,26 +111,19 @@ function Navbar() {
           </button>
         </motion.div>
 
-        {/* Mobile menu overlay */}
+        {/* Mobile menu overlay and sidebar (no changes here) */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
               className="fixed inset-0 bg-black bg-opacity-50 z-40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={closeMenu}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }} onClick={closeMenu}
             />
           )}
         </AnimatePresence>
-
-        {/* Sidebar menu for mobile */}
         <motion.div
           className={`fixed inset-y-0 right-0 transform bg-white p-4 w-64 text-deep-purple-800 z-50`}
-          initial={{ x: '100%' }}
-          animate={{ x: isMenuOpen ? '0%' : '100%' }}
-          exit={{ x: '100%' }}
+          initial={{ x: '100%' }} animate={{ x: isMenuOpen ? '0%' : '100%' }} exit={{ x: '100%' }}
           transition={{ duration: 0.3 }}
         >
           <button onClick={closeMenu} className="text-black mb-4">Close</button>
@@ -111,7 +133,7 @@ function Navbar() {
           <a href="#about" className={mobileNavLinkClasses} onClick={closeMenu}>About</a>
         </motion.div>
 
-        {/* Navigation for larger screens */}
+        {/* Navigation for larger screens (no changes here) */}
         <div className="hidden md:flex space-x-4 items-center">
           <a href="#" className={navLinkClasses} onClick={closeMenu}>Home</a>
           <a href="#projects" className={navLinkClasses} onClick={closeMenu}>Projects</a>

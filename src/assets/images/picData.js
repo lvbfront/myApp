@@ -17,6 +17,7 @@ import tail from './tail.png'
 import sql from './SQL.png'
 import tf from './tf.png'
 import ring from './ring.jpg'
+import postgresql from './Postgresql_elephant.svg.png'
 
 
 const carouselData = [
@@ -31,6 +32,7 @@ export default carouselData;
 // The export below seems redundant if you're already exporting the data as default
 // but if you need to export images for other uses, you can keep this.
 export {
+  postgresql,
   mewing,
   killer,
   goofy,

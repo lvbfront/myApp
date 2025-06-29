@@ -893,71 +893,76 @@ export default function InfiniteMenu({ items = [] }) {
 
       {activeItem && (
         <>
+          {/* --- TITLE --- */}
           <h2
             className={`
-           select-none
-           absolute
-           font-black
-           text-black
-           [font-size:4rem]
-           left-[1.6em]
-           top-1/2
-           transform
-           translate-x-[20%]
-           -translate-y-1/2
-           transition-all
-           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-           ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms]'
-                : 'opacity-100 pointer-events-auto duration-[500ms]'
+              select-none absolute font-black text-black transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              
+
+              {/* === BACKGROUND CLASSES ADDED HERE === */}
+              bg-gray-100/75 backdrop-blur-sm rounded-lg px-4 py-1
+              
+              {/* Mobile Styles: Centered at the bottom, smaller text */}
+              text-3xl text-center bottom-[25%] left-1/2 -translate-x-1/2 w-full px-4
+
+              {/* Desktop Styles (md and up): On the left, large text */}
+              md:text-left md:[font-size:4rem] md:left-[1.6em] md:top-1/2 md:bottom-auto md:w-auto md:-translate-y-1/2 md:transform-none
+
+              {/* Transition Fade/Show */}
+              ${isMoving
+                ? 'opacity-0 pointer-events-none'
+                : 'opacity-100 pointer-events-auto'
               }
-         `}
+            `}
           >
             {activeItem.title}
           </h2>
 
+          {/* --- DESCRIPTION --- */}
           <p
             className={`
-           select-none
-           absolute
-           text-black
-           max-w-[10ch]
-           text-[1.5rem]
-           top-1/2
-           right-[1%]
-           transition-all
-           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-           ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2'
-                : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2'
+              select-none absolute text-black transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+
+
+              {/* === BACKGROUND CLASSES ADDED HERE === */}
+              bg-gray-100/75 backdrop-blur-sm rounded-lg px-4 py-1
+
+              {/* Mobile Styles: Centered below title */}
+              text-lg text-center bottom-[20%] left-1/2 -translate-x-1/2 w-full px-4
+              
+              {/* Desktop Styles (md and up): On the right */}
+              md:text-right md:max-w-[10ch] md:text-[1.5rem] md:right-[1%] md:top-1/2 md:left-auto md:bottom-auto md:w-auto md:-translate-y-1/2 md:transform-none
+              
+              {/* Transition Fade/Show */}
+              ${isMoving
+                ? 'opacity-0 pointer-events-none'
+                : 'opacity-100 pointer-events-auto'
               }
-         `}
+            `}
           >
             {activeItem.description}
           </p>
 
+          {/* --- BUTTON --- */}
           <div
             onClick={handleButtonClick}
             className={`
-           absolute
-           left-1/2
-           z-10
-           w-[60px]
-           h-[60px]
-           grid
-           place-items-center
-           bg-[#00ffff]
-           border-[5px]
-           border-black
-           rounded-full
-           cursor-pointer
-           transition-all
-           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-           ${isMoving
-                ? 'bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2'
-                : 'bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2'
+              absolute z-10 grid place-items-center w-[60px] h-[60px] 
+              bg-[#00ffff] border-[5px] border-black rounded-full cursor-pointer
+              transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+              
+              {/* Mobile Styles: Centered at the very bottom */}
+              left-1/2 -translate-x-1/2
+
+              {/* Desktop Styles (md and up): Reset horizontal translation */}
+              md:transform-none
+
+              {/* Transition and position */}
+              ${isMoving
+                ? 'bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0'
+                : 'bottom-8 md:bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100'
               }
-         `}
+            `}
           >
             <p className="select-none relative text-[#060010] top-[2px] text-[26px]">
               &#x2197;

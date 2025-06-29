@@ -1,150 +1,145 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import emailjs from 'emailjs-com';   {/** i used emailjs service*/}
-import { FaGithub, FaTwitter } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
+import { FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState(''); // 'sending', 'success', 'error'
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setStatus('sending');
 
     emailjs
       .send('service_745hnp8', 'template_b5ii9hc', formData, 'SNpVJoSK24uL7yaBH')
       .then((response) => {
         console.log('Message sent successfully!', response.status, response.text);
-        setSubmitted(true);
+        setStatus('success');
         setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setSubmitted(false), 3000);
+        setTimeout(() => setStatus(''), 5000); // Hide message after 5 seconds
       })
       .catch((err) => {
         console.error('Failed to send message:', err);
+        setStatus('error');
+        setTimeout(() => setStatus(''), 5000);
       });
+  };
+
+  // Animation variants for staggering children
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 100 },
+    },
   };
 
   return (
     <motion.section
       id="contact"
-      className="contact py-12 px-6 md:px-12 bg-gradient-to-r from-blue-400 to-purple-200 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      className="contact min-h-screen py-20 px-6 md:px-12 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={containerVariants}
     >
-      <h2 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Contact Me</h2>
-      <p className="text-gray-700 text-lg mb-4 text-center">
-        Feel free to reach out for any project collaborations or job opportunities.
-      </p>
-      <p className="text-gray-700 text-lg mb-4 text-center">Email: abdu44ll3ah55@gmail.com</p>
+      <div className="container mx-auto max-w-6xl">
+        {/* Main grid layout: 1 column on mobile, 2 on desktop */}
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          
+          {/* Left Column: Info and Socials */}
+          <motion.div variants={itemVariants} className="text-center md:text-left">
+            <h2 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+              Let's Connect
+            </h2>
+            <p className="text-lg text-gray-300 mb-6 max-w-md mx-auto md:mx-0">
+              Have a project in mind or just want to say hello? I'd love to hear from you. Fill out the form or reach out via email.
+            </p>
+            
+            <motion.div variants={itemVariants} className="flex items-center justify-center md:justify-start gap-4 mb-8 text-gray-300">
+              <FaEnvelope className="text-cyan-400" />
+              <span>abdu44ll3ah55@gmail.com</span>
+            </motion.div>
+            
+            <motion.div variants={itemVariants} className="flex justify-center md:justify-start space-x-8">
+              <a href="https://github.com/lvbfront" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-transform duration-300 hover:scale-125 text-4xl">
+                <FaGithub />
+              </a>
+              <a href="https://x.com/pyuqU99" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-transform duration-300 hover:scale-125 text-4xl">
+                <FaTwitter />
+              </a>
+            </motion.div>
+          </motion.div>
 
-      {/* Social Links */}
-      <div className="flex justify-center space-x-6 mb-6">
-        <a
-          href="https://github.com/lvbfront"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-800 hover:text-gray-600 text-2xl"
-        >
-          <FaGithub />
-        </a>
-        <a
-          href="https://x.com/pyuqU99"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-800 hover:text-gray-600 text-2xl"
-        >
-          <FaTwitter />
-        </a>
-      </div>
-
-      <form onSubmit={handleSubmit} className="mt-8 max-w-lg mx-auto">
-        <motion.div
-          className="mb-4"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Your Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="shadow appearance-none placeholder-gray-600 text-gray-700 border rounded w-full py-2 px-3 bg-gradient-to-br from-blue-500 via-purple-300 to-pink-200  leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          className="mb-4"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Your Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="shadow appearance-none placeholder-gray-600 border bg-gradient-to-br from-blue-500 via-purple-300 to-pink-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
-        </motion.div>
-
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="message">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows="4"
-            placeholder="Your Message..."
-            value={formData.message}
-            onChange={handleChange}
-            className="shadow appearance-none placeholder-gray-600 border bg-gradient-to-br from-blue-500 via-purple-300 to-pink-200 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          ></textarea>
-        </motion.div>
-
-        <motion.button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          initial={{ scale: 1 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-        >
-          Send Message
-        </motion.button>
-      </form>
-
-      {submitted && (
-        <div className="mt-4 text-green-600 text-center">
-          Your message has been sent!
+          {/* Right Column: "Frosted Glass" Form */}
+          <motion.div variants={itemVariants} className="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-lg">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <label className="block text-gray-300 text-sm font-semibold mb-2" htmlFor="name">
+                  Full Name
+                </label>
+                <input
+                  type="text" id="name" name="name" placeholder="your name"
+                  value={formData.name} onChange={handleChange} required
+                  className="w-full bg-transparent border-b-2 border-gray-400 text-white placeholder:text-gray-500 py-2 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-gray-300 text-sm font-semibold mb-2" htmlFor="email">
+                  Email Address
+                </label>
+                <input
+                  type="email" id="email" name="email" placeholder="you@example.com"
+                  value={formData.email} onChange={handleChange} required
+                  className="w-full bg-transparent border-b-2 border-gray-400 text-white placeholder:text-gray-500 py-2 focus:outline-none focus:border-cyan-400 transition-colors"
+                />
+              </div>
+              <div className="mb-8">
+                <label className="block text-gray-300 text-sm font-semibold mb-2" htmlFor="message">
+                  Message
+                </label>
+                <textarea
+                  id="message" name="message" rows="4" placeholder="Your message here..."
+                  value={formData.message} onChange={handleChange} required
+                  className="w-full bg-transparent border-b-2 border-gray-400 text-white placeholder:text-gray-500 py-2 focus:outline-none focus:border-cyan-400 transition-colors resize-none"
+                ></textarea>
+              </div>
+              <motion.button
+                type="submit"
+                disabled={status === 'sending'}
+                className="w-full font-bold py-3 px-4 rounded-lg text-white bg-gradient-to-r from-purple-600 to-cyan-500 disabled:opacity-50"
+                whileHover={{ scale: 1.05, boxShadow: '0px 0px 12px rgb(34, 211, 238)' }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
+                {status === 'sending' ? 'Sending...' : 'Send Message'}
+              </motion.button>
+            </form>
+            {status === 'success' && <p className="mt-4 text-green-400 text-center">Message sent successfully!</p>}
+            {status === 'error' && <p className="mt-4 text-red-400 text-center">Failed to send message. Please try again.</p>}
+          </motion.div>
         </div>
-      )}
+      </div>
     </motion.section>
   );
 };
