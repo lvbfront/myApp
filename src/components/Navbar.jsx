@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link as RouterLink, useLocation } from 'react-router-dom'; // 1. Import tools from React Router
 import CircularText from './CircularText';
 import { Logo } from '../assets/images/picData';
 
 /**
  * A custom hook to detect scroll direction.
- * @returns {String} 'up' or 'down'
  */
 const useScrollDirection = () => {
-  const [scrollDirection, setScrollDirection] = useState(null);
+  const [scrollDirection, setScrollDirection] = useState('up');
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY.current) {
+      if (currentScrollY > 10 && currentScrollY > lastScrollY.current) {
         setScrollDirection('down');
       } else {
         setScrollDirection('up');
@@ -22,7 +23,7 @@ const useScrollDirection = () => {
       lastScrollY.current = currentScrollY;
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -31,114 +32,125 @@ const useScrollDirection = () => {
   return scrollDirection;
 };
 
+// Data for navigation links
+const navLinks = [
+  { to: 'home', text: 'Home' },
+  { to: 'about', text: 'About' },
+  { to: 'skills', text: 'Skills' },
+  { to: 'projects', text: 'Projects' },
+  { to: 'contact', text: 'Contact' },
+];
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const circularTextRef = useRef(null);
-  const scrollDirection = useScrollDirection(); // Use the custom hook
+  const scrollDirection = useScrollDirection();
+  
+  // 2. Detect the current page path
+  const location = useLocation();
+  const onHomePage = location.pathname === '/';
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  const navLinkClasses = "hover:text-gray-500 px-3 py-2 cursor-pointer rounded-md";
-  const mobileNavLinkClasses = "block hover:text-gray-500 cursor-pointer py-2";
+  const navLinkClasses = "relative text-gray-200 transition-colors duration-300 hover:text-cyan-400 cursor-pointer group";
 
-  // Framer Motion variants for the navbar animation
   const navbarVariants = {
-    // Navbar is visible
-    visible: {
-      y: 0,
-      transition: { duration: 0.3, ease: 'easeInOut' },
-    },
-    // Navbar is hidden (slid up)
-    hidden: {
-      y: '-100%',
-      transition: { duration: 0.3, ease: 'easeInOut' },
-    },
+    visible: { y: 0, transition: { duration: 0.35, ease: 'easeInOut' } },
+    hidden: { y: '-100%', transition: { duration: 0.35, ease: 'easeInOut' } },
+  };
+
+  const topVariant = { closed: { rotate: 0, y: 0 }, opened: { rotate: 45, y: 8 } };
+  const middleVariant = { closed: { opacity: 1 }, opened: { opacity: 0 } };
+  const bottomVariant = { closed: { rotate: 0, y: 0 }, opened: { rotate: -45, y: -8 } };
+
+  const renderLinks = (isMobile = false) => {
+    return navLinks.map((link) => {
+      const linkContent = isMobile ? link.text : (
+        <>
+          {link.text}
+          <span className="absolute bottom-0 left-0 h-0.5 bg-cyan-400 w-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+        </>
+      );
+
+      // 3. Conditionally render the correct link type
+      if (onHomePage) {
+        return (
+          <ScrollLink
+            key={link.to} to={link.to} spy={true} smooth={true} duration={500} offset={-80}
+            className={isMobile ? "text-2xl text-gray-300 hover:text-cyan-400 cursor-pointer" : navLinkClasses}
+            activeClass={isMobile ? "text-cyan-400 font-bold" : "text-cyan-400"}
+            onClick={closeMenu}
+          >
+            {linkContent}
+          </ScrollLink>
+        );
+      } else {
+        return (
+          <RouterLink
+            key={link.to}
+            to={`/${link.to === 'home' ? '' : '#' + link.to}`} // Navigates to homepage, then jumps to the section ID
+            className={isMobile ? "text-2xl text-gray-300 hover:text-cyan-400 cursor-pointer" : navLinkClasses}
+            onClick={closeMenu}
+          >
+            {linkContent}
+          </RouterLink>
+        );
+      }
+    });
   };
 
   return (
     <motion.nav
-      className="bg-gray-200 p-4 w-full fixed top-0 z-30 shadow-md"
+      className="bg-black/30 backdrop-blur-md p-4 w-full fixed top-0 z-50 shadow-lg"
       variants={navbarVariants}
-      // Animate based on scroll direction. Show if scrolling up, hide if scrolling down (and not at the top).
       animate={scrollDirection === 'down' ? 'hidden' : 'visible'}
       initial="visible"
     >
       <div className="container mx-auto flex items-center justify-between">
-        {/* Logo with animation and circular text */}
-        <a href="#" className="flex items-center" onClick={closeMenu}>
+        {/* Logo */}
+        <RouterLink to="/" className="flex items-center cursor-pointer" onClick={closeMenu}>
           <div
             className="relative flex items-center justify-center mr-3"
             onMouseEnter={() => circularTextRef.current?.hoverStart()}
             onMouseLeave={() => circularTextRef.current?.hoverEnd()}
           >
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <CircularText
-                ref={circularTextRef}
-                text=" A - W - B -"
-                radius={40}
-                spinDuration={25}
-                onHover="speedUp"
-                textColor="text-deep-purple-800"
-                textSize="text-[10px] font-semibold"
-              />
+              <CircularText ref={circularTextRef} text=" A - W - B -" radius={40} spinDuration={25} onHover="speedUp" textColor="text-white" textSize="text-[10px] font-semibold" />
             </div>
-            <motion.img
-              src={Logo}
-              alt="Store logo"
-              className="w-12 h-12 rounded-full shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            />
+            <motion.img src={Logo} alt="Store logo" className="w-12 h-12 rounded-full" whileHover={{ scale: 1.1 }} transition={{ type: 'spring', stiffness: 300 }} />
           </div>
-          <motion.span
-            className="font-bold text-xl text-deep-purple-800"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Abdullah
-          </motion.span>
-        </a>
+          <span className="font-bold text-xl text-white">Abdullah</span>
+        </RouterLink>
 
-        {/* Mobile menu button */}
-        <motion.div className="relative md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-          <button className="text-deep-purple-800" onClick={toggleMenu}>
-            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
+        {/* Animated Hamburger Menu Icon */}
+        <div className="md:hidden">
+          <button className="w-8 h-6 flex flex-col justify-between" onClick={toggleMenu}>
+              <motion.span variants={topVariant} animate={isMenuOpen ? "opened" : "closed"} className="block h-0.5 w-full bg-white rounded-full"></motion.span>
+              <motion.span variants={middleVariant} animate={isMenuOpen ? "opened" : "closed"} className="block h-0.5 w-full bg-white rounded-full"></motion.span>
+              <motion.span variants={bottomVariant} animate={isMenuOpen ? "opened" : "closed"} className="block h-0.5 w-full bg-white rounded-full"></motion.span>
           </button>
-        </motion.div>
+        </div>
 
-        {/* Mobile menu overlay and sidebar (no changes here) */}
+        {/* Mobile Menu Sidebar */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }} onClick={closeMenu}
-            />
+            <>
+              <motion.div className="fixed inset-0 bg-black/60 z-40" onClick={closeMenu} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+              <motion.div
+                className="fixed inset-y-0 right-0 bg-gray-900 p-8 w-64 z-50 flex flex-col space-y-6 border-l border-gray-700"
+                initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              >
+                <button onClick={closeMenu} className="self-end text-gray-400 hover:text-white text-3xl" aria-label="Close menu">&times;</button>
+                {renderLinks(true)}
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
-        <motion.div
-          className={`fixed inset-y-0 right-0 transform bg-white p-4 w-64 text-deep-purple-800 z-50`}
-          initial={{ x: '100%' }} animate={{ x: isMenuOpen ? '0%' : '100%' }} exit={{ x: '100%' }}
-          transition={{ duration: 0.3 }}
-        >
-          <button onClick={closeMenu} className="text-black mb-4">Close</button>
-          <a href="#" className={mobileNavLinkClasses} onClick={closeMenu}>Home</a>
-          <a href="#projects" className={mobileNavLinkClasses} onClick={closeMenu}>Projects</a>
-          <a href="#contact" className={mobileNavLinkClasses} onClick={closeMenu}>Contact</a>
-          <a href="#about" className={mobileNavLinkClasses} onClick={closeMenu}>About</a>
-        </motion.div>
 
-        {/* Navigation for larger screens (no changes here) */}
-        <div className="hidden md:flex space-x-4 items-center">
-          <a href="#" className={navLinkClasses} onClick={closeMenu}>Home</a>
-          <a href="#projects" className={navLinkClasses} onClick={closeMenu}>Projects</a>
-          <a href="#contact" className={navLinkClasses} onClick={closeMenu}>Contact</a>
-          <a href="#about" className={navLinkClasses} onClick={closeMenu}>About</a>
+        {/* Navigation for larger screens */}
+        <div className="hidden md:flex space-x-8 items-center">
+          {renderLinks()}
         </div>
       </div>
     </motion.nav>

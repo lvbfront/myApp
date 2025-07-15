@@ -42,6 +42,27 @@ const items = [
 ];
 
 
+// 1. DEFINED ANIMATION VARIANTS (This was the missing part)
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: 'easeOut',
+      staggerChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+
+
 const HomePage = () => {
   return (
     <motion.div 
@@ -90,31 +111,31 @@ const HomePage = () => {
 
 
       {/* About Section */}
-      <motion.section
-  className="about py-16 mt-6 p-8 rounded-lg bg-gradient-to-br from-blue-500 via-purple-300 to-pink-200 shadow-lg px-8 md:px-16 flex flex-col items-center text-center"
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, delay: 0.3 }}
->
-  
-    
-  <GlitchText
-    speed={5}
-    enableShadows={true}
-    enableOnHover={false}
-    className='custom-class'
-  >
-    WHO AM I?
-  </GlitchText>
-  <p className="text-gray-800 text-lg leading-relaxed max-w-3xl">
-  I am an AI student passionate about creating AI models and building websites. I specialize in using Python, TensorFlow, React, farmer Motion and Tailwind CSS to craft solutions and dynamic applications.
-  </p>
-
-  
-  
-
-
-</motion.section>
+      {/* CORRECTED "ABOUT" SECTION */}
+        <motion.section
+          id="about"
+          className="py-24 text-center"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <motion.div
+            variants={itemVariants}
+            className="relative w-full h-48 md:h-64 mb-8"
+          >
+            <ASCIIText
+              text="WHO AM I?"
+              asciiFontSize={4}
+            />
+          </motion.div>
+          <motion.p
+            variants={itemVariants}
+            className="text-lg text-gray-300 leading-relaxed max-w-3xl mx-auto"
+          >
+            I am a passionate AI student dedicated to crafting intelligent models and building beautiful, dynamic websites. My expertise lies at the intersection of Python, TensorFlow, and modern web technologies like React and Framer Motion, allowing me to create seamless and impactful digital solutions.
+          </motion.p>
+        </motion.section>
 
 
 

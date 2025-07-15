@@ -2,6 +2,9 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'], // Scans all your component files for Tailwind classes
   theme: {
     extend: {
+      fontFamily: {
+        bitcount: ['"Bitcount Grid Double"', 'monospace'], // Fallback to monospace
+      },
       // Extended theme properties with new animations
       keyframes: {
         glitch: {
