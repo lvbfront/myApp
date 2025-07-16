@@ -7,7 +7,7 @@ import RotatingText from '../components/RotatingText.jsx';
 import InfiniteMenu from '../components/InfiniteMenu.jsx';
 import CircularGallery from '../components/CircularGallery.jsx';
 import ASCIIText from '../components/ASCIIText.jsx';
-
+import ImagePuzzle from '../components/ImagePuzzle.jsx';
 // Import your images and icons
 import { number, MalariaRe, AIThingy, python, ring } from '../assets/images/picData.js';
 import { FaArrowDown } from 'react-icons/fa';
@@ -183,6 +183,37 @@ const HomePage = () => {
             <InfiniteMenu items={items} />
           </motion.div>
         </motion.section>
+
+
+
+        
+{/* --- PUZZLE GAME SECTION (ADD THIS) --- */}
+        <motion.section
+          id="puzzle"
+          className="py-24 text-center"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <motion.h2
+            variants={itemVariants}
+            className="text-4xl md:text-5xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400"
+          >
+            Interactive Puzzle
+          </motion.h2>
+          <motion.p 
+            variants={itemVariants} 
+            className="text-center text-gray-400 mb-12 text-lg"
+          >
+            Solve the puzzle or upload your own image to try!
+          </motion.p>
+          <motion.div variants={itemVariants}>
+            <ImagePuzzle />
+          </motion.div>
+        </motion.section>
+
+
       </main>
 
       {/* --- CONTACT SECTION --- */}
